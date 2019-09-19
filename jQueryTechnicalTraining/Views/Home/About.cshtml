@@ -1,0 +1,128 @@
+﻿<head>
+    <title>jQuery Technical Training</title>
+    <link rel="stylesheet" type="text/css" href="main.css">
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"
+            integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
+            crossorigin="anonymous"></script>
+    @Scripts.Render("~/bundles/jqueryui")
+    @Styles.Render("~/Content/cssjqryUi")
+</head>
+<header>
+    <h1>jQuery Project by: <span id="name1"></span> </h1>
+</header>
+
+<div  class="row">
+    <div class="col-sm-6">
+        <h3>Step 1</h3>
+        <label>Date:</label>
+        <input type="date" class="form-control" id="date">
+        <br />
+        <button class="btn btn-primary" id="urlID1">Generate URL</button>
+        <br />
+        <label>URL:</label>
+        <textarea readonly class="form-control" id="urlID"></textarea>
+    </div>
+    <div style="position:absolute" id="step2" class="col-sm-6">
+        <h3>Step 2</h3>
+        <button id="download" class="btn btn-primary">Download</button>
+        <br />
+        <label>JSON:</label>
+        <textarea readonly style="height:150px" id="jsonField" class="form-control"></textarea>
+        <br />
+    </div>
+</div>
+<hr />
+<div style="position:absolute" id="step3" class="row">
+    <h3>Step 3 ~ 4</h3>
+    <div class="col-sm-4">
+        <button style="margin-bottom: 5px" id="step3btn" class="btn btn-primary">Generate Table</button>
+        <br />
+    </div>
+    <div id="tblHide" class="col-sm-6">
+        <table id="table" class="table table-bordered table-hover table-striped">
+            <tr>
+                <th>Rate</th>
+                <th>Currency</th>
+                <th>Calculated Amount</th>
+            </tr>
+        </table>
+    </div>
+</div>
+<br />
+
+<script type="text/javascript">
+
+    var orders = $('#orders');
+    $('#name1').text("Robert Kidd");
+    $('#date').datepicker();
+    var cncDate = $('#date').val();
+    $('#step2').hide();
+    $('#step3').hide();
+    $('#step4').hide();
+
+    $('#date').change(function () {
+        $('#urlID').val("https://api.exchangeratesapi.io/" + $('#date').val() + "?base=USD");
+    })
+
+    $('#urlID1').click(function () {
+        $('#step2').animate({
+            left: '1000px',
+            height: '+=150px',
+            width: '+=150px'
+        })
+
+        $('#step2').show();
+    });
+
+
+    $('#download').click(function () {
+        var url = $('#urlID').val();
+        $('#step3').animate({
+            right: '940px',
+            height: '+=150px',
+            width: '+=150px'
+        });
+        $('#step3').show();
+        $('#table').hide();
+
+        $.ajax({
+            method: 'GET',
+            url: url,
+            dataType: 'json',
+            success: function (data) {
+                var string3 = JSON.stringify(data);
+                $('#jsonField').val(string3);
+
+                var i;
+                var x = 0;
+                var row;
+                var list = Object.keys(data.rates);
+                for (i in data.rates) {
+                    row += '<tr>'
+                    row += '<td>' + data.rates[i] + '</td>';
+                    row += '<td>' + list[x] + '</td>';
+                    row += '<td>' + (100 * data.rates[i]).toFixed(2) + '</td>';
+                    row += '</tr>';
+                    x++;
+                }
+
+                $('#table').append(row);
+
+            },
+            error: function (data) {
+                var errors = data.responseJSON;
+                console.log(errors);
+            }
+        });
+
+        $('#step3btn').click(function () {
+            $('#table').fadeIn();
+
+            $('#table').show();
+
+        });
+    });
+
+</script>
+
+
